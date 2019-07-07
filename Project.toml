@@ -1,0 +1,4 @@
+name = "DerivativeFreeSolvers"
+uuid = "704b706e-a0d9-11e9-03cb-eb2963733e22"
+authors = ["Abel Soares Siqueira <abel.s.siqueira@gmail.com>"]
+version = "0.1.0"
