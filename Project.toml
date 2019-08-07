@@ -2,3 +2,17 @@ name = "DerivativeFreeSolvers"
 uuid = "704b706e-a0d9-11e9-03cb-eb2963733e22"
 authors = ["Abel Soares Siqueira <abel.s.siqueira@gmail.com>"]
 version = "0.1.0"
+
+[deps]
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+NLPModels = "a4795742-8479-5a88-8948-cc11e1c8c1a6"
+Primes = "27ebfcd6-29c5-5fa9-bf4b-fb8fc14df3ae"
+Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
+SolverTools = "b5612192-2639-5dc1-abfe-fbedd65fab29"
+
+[extras]
+Logging = "56ddb016-857b-54e1-b83d-db4d58db5568"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Logging", "Test"]

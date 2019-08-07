@@ -1,5 +1,11 @@
 module DerivativeFreeSolvers
 
-greet() = print("Hello World!")
+# JSO
+using NLPModels, SolverTools
+
+# stdlib
+using LinearAlgebra, Printf
+
+include("orthomads.jl")
 
 end # module
