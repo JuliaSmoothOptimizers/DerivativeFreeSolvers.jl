@@ -44,7 +44,7 @@ function orthomads(nlp :: AbstractNLPModel;
   start_time = time()
   elapsed_time = 0.0
   tired = neval_obj(nlp) ≥ max_eval ≥ 0 || elapsed_time > max_time || iter > max_iter ≥ 0
-  ∂f = 0.0
+  ∂f = Inf
   satisfied = stop_with_small_step && Δ ≤ steptol
 
   xt = similar(x)
