@@ -18,8 +18,8 @@ function orthomads(nlp :: AbstractNLPModel;
                    max_eval :: Int=nlp.meta.nvar*200,
                    max_time :: Float64=30.0,
                    max_iter :: Int=-1,
-                   stop_with_small_step :: Bool=false,
-                   steptol :: Real=0.0,
+                   stop_with_small_step :: Bool=true,
+                   steptol :: Real=1e-8,
                   )
 
   f(x) = obj(nlp, x)
