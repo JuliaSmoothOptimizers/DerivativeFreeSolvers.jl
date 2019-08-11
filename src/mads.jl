@@ -107,7 +107,7 @@ function mads(nlp :: AbstractNLPModel;
       seq = min(seq - 1, -1)
       Δ /= T(2)^(-1 / seq)
       if Px > 0
-        μ *= 2
+        μ = min(2μ, 1 / eps(T))
       end
     end
     iter += 1
