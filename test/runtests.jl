@@ -34,7 +34,8 @@ function tests()
     end
   end
 
-  methods = [mads]
+  madsX(nlp; kwargs...) = mads(nlp; extreme=true, kwargs...)
+  methods = [mads, madsX]
   @testset "Constrained problems with non-empty interior" begin
     for mtd in methods
       for (nlp, sol) in [(ADNLPModel(x->sum(x.^2), [2.1; 3.2], lvar=-ones(2), uvar=4*ones(2)), zeros(2)),
