@@ -24,6 +24,9 @@ function mads(nlp :: AbstractNLPModel;
               steptol :: Real=1e-8,
               greedy :: Bool=false,
               extreme :: Bool=false,
+              initial_stepsize :: Real=min(one(eltype(x)), minimum(nlp.meta.uvar - nlp.meta.lvar) / 10),
+              base_increase :: Real=eltype(x)(4),
+              base_decrease :: Real=eltype(x)(2),
              )
 
   T = eltype(x)
@@ -54,7 +57,7 @@ function mads(nlp :: AbstractNLPModel;
 
   fx, Px = fandP(x)
 
-  Δ = min(one(T), minimum(nlp.meta.uvar - nlp.meta.lvar) / 10)
+  Δ = initial_stepsize
   μ = one(T)
   ϕx = fx + μ * Px
   Δmin = eps(T)
@@ -105,10 +108,10 @@ function mads(nlp :: AbstractNLPModel;
       x .-= (2s * Δ * q[i]) .* q
       x[i] += dot(q, q) * s * Δ
       seq = max(seq + 1, 1)
-      Δ *= T(4)^seq
+      Δ *= base_increase^seq
     else
       seq = max(-5, min(seq - 1, -1))
-      Δ /= T(2)^(-1 / seq)
+      Δ /= base_decrease^(-1 / seq)
       if Px > 0
         μ = min(2μ, 1 / eps(T))
       end
