@@ -13,7 +13,10 @@ function coordinate_search(nlp :: AbstractNLPModel;
                            β :: Real = 2 * one(eltype(x)),
                            max_time :: Float64  = 30.0,
                            max_eval :: Int = -1,
-                           greedy :: Bool = true)
+                           greedy :: Bool = true,
+                           memoization :: Bool = false,
+                           max_elm :: Int = 100,
+                           min_elm :: Int = 10)
 
   α <= 0 && error("Invalid Parameter : α ≤ 0 ")
   β <= 1 && error("Invalid Parameter : β ≤ 1 ")
