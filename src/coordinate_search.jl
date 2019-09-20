@@ -13,7 +13,9 @@ function coordinate_search(nlp :: AbstractNLPModel;
                            β :: Real = 2 * one(eltype(x)),
                            max_time :: Float64  = 30.0,
                            max_eval :: Int = -1,
-                           greedy :: Bool = true)
+                           greedy :: Bool = true,
+                           max_elm :: Int = 0,
+                           min_elm :: Int = 0)
 
   α <= 0 && error("Invalid Parameter : α ≤ 0 ")
   β <= 1 && error("Invalid Parameter : β ≤ 1 ")
@@ -70,5 +72,8 @@ function coordinate_search(nlp :: AbstractNLPModel;
 
   return GenericExecutionStats(status, nlp, solution=x, objective=f,
                                iter = k, elapsed_time = el_time)
+end
 
+function coordinate_search_memo(nlp; min_elm = 100, max_elm = 1000, kwargs...)
+  return coordinate_search(MemoNLP(nlp, max_elm=max_elm, min_elm=min_elm); kwargs ...)
 end

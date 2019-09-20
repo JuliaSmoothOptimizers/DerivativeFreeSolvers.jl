@@ -15,7 +15,9 @@ function nelder_mead(nlp :: AbstractNLPModel;
                      ref :: Real = - one(eltype(x)),
                      exp :: Real = - one(eltype(x)) * 2,
                      ocn :: Real = - one(eltype(x)) / 2,
-                     icn :: Real = one(eltype(x)) / 2)
+                     icn :: Real = one(eltype(x)) / 2,
+                     max_elm :: Int = 0,
+                     min_elm :: Int = 0)
 
   # Initial simplex
   n = nlp.meta.nvar
@@ -125,4 +127,8 @@ function nelder_mead(nlp :: AbstractNLPModel;
 
   return GenericExecutionStats(status, nlp, solution=pairs[1][1], objective=pairs[1][2],
                                iter = k, elapsed_time = el_time)
+end
+
+function nelder_mead_memo(nlp; min_elm = 100, max_elm = 1000, kwargs...)
+  return nelder_mead(MemoNLP(nlp, max_elm=max_elm, min_elm=min_elm); kwargs ...)
 end
