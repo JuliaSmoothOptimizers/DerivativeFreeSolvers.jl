@@ -4,7 +4,10 @@ export nelder_mead
     nelder_mead(nlp)
 
 This implementation follows the algorithm described in chapter 9 of [1].
+The Oriented Restart follows [2].
 [1] Numerical Optimization (Jorge Nocedal and Stephen J. Wright), Springer, 2006.
+[2] C. T. Kelley. Detection and remediation of stagnation in the nelder–mead algorithm using a
+sufficient decrease condition. SIAM J. on Optimization, 1999.
 """
 function nelder_mead(nlp :: AbstractNLPModel;
                      x :: AbstractVector = copy(nlp.meta.x0),
@@ -15,7 +18,10 @@ function nelder_mead(nlp :: AbstractNLPModel;
                      ref :: Real = - one(eltype(x)),
                      exp :: Real = - one(eltype(x)) * 2,
                      ocn :: Real = - one(eltype(x)) / 2,
-                     icn :: Real = one(eltype(x)) / 2)
+                     icn :: Real = one(eltype(x)) / 2,
+                     oriented_restart :: Bool = true,
+                     max_restart :: Int = 3,
+                     α :: Real = one(eltype(x)) * 1e-4)
 
   # Initial simplex
   n = nlp.meta.nvar
@@ -37,14 +43,14 @@ function nelder_mead(nlp :: AbstractNLPModel;
 
   x_trial = zeros(T, n)
   x_cen = copy(x_trial)
-
+  oriented_restart && (fₖ = sum(pairs[i][2] for i in 1:nlp.meta.nvar+1)/(nlp.meta.nvar+1))
+  n_res = 0
   k = 0
   el_time = 0.0
   start_time = time()
   tired = neval_obj(nlp) > max_eval >= 0 || el_time > max_time
-  norm_opt = norm(first(pairs)[1] - last(pairs)[1])
+  norm_opt = norm(last(pairs)[1] - first(pairs)[1])
   optimal = norm_opt < tol
-  T = eltype(x)
   status =:unknown
   @info log_header([:iter, :f, :nrm], [Int, T, T], hdr_override=Dict(:f => "f(x)", :nrm => "‖x₁ - xₙ₊₁‖"))
 
@@ -97,7 +103,34 @@ function nelder_mead(nlp :: AbstractNLPModel;
       end
     end
 
-    if shrink
+    reshape = true
+    if oriented_restart && n_res < max_restart
+      fₖ₊₁ = sum(pairs[i][2] for i in 1:nlp.meta.nvar+1)/(nlp.meta.nvar+1)
+      V = hcat([pairs[i][1] - pairs[1][1]  for i in 2:nlp.meta.nvar+1]...)
+      δ = [pairs[i][2] - pairs[1][2] for i in 2:nlp.meta.nvar+1]
+      σ₋ = minimum(norm(pairs[i][1] - pairs[1][1]) for i in 2:nlp.meta.nvar+1)
+
+      ϕ, deg_simplex = try
+        ϕ = V'\δ
+        ϕ, fₖ₊₁ - fₖ ≥ - α * norm(ϕ)^2 && fₖ₊₁ - fₖ < 0
+      catch e
+        isa(e, SingularException) && zeros(T, n), true
+      end
+      
+      if deg_simplex
+        for j in 2:nlp.meta.nvar+1
+          y₁ = copy(pairs[1][1])
+          y₁[j-1] += sign(ϕ[j-1]) * 0.5 * σ₋
+          pairs[j][1] .= y₁
+          pairs[j][2] = obj(nlp, pairs[j][1])
+        end
+        n_res += 1
+        reshape = false
+      end
+      fₖ = fₖ₊₁
+    end
+
+    if shrink && reshape
       for i = 2:n+1
         x_trial .= (pairs[i][1] + pairs[1][1])/2
         pairs[i][1] .= x_trial
@@ -108,7 +141,7 @@ function nelder_mead(nlp :: AbstractNLPModel;
     sort!(pairs, by=x->x[2])
     k += 1
     tired = neval_obj(nlp) > max_eval ≥ 0 || el_time > max_time
-    norm_opt = norm(first(pairs)[1] - last(pairs)[1])
+    norm_opt = norm(last(pairs)[1] - first(pairs)[1])
     optimal =  norm_opt < tol
     el_time = time() - start_time
   end
