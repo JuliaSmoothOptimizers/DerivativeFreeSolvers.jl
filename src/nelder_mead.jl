@@ -43,7 +43,7 @@ function nelder_mead(nlp :: AbstractNLPModel;
 
   x_trial = zeros(T, n)
   x_cen = copy(x_trial)
-  oriented_restart && (fₖ = sum(pairs[i][2] for i in 1:nlp.meta.nvar+1)/(nlp.meta.nvar+1))
+  oriented_restart && (fₖ = sum(pairs[i][2] for i in 1:n+1) / (n+1))
   n_res = 0
   k = 0
   el_time = 0.0
@@ -57,8 +57,8 @@ function nelder_mead(nlp :: AbstractNLPModel;
   while !(optimal || tired)
 
     shrink = true
-    x_cen .= sum(pairs[i][1] for i in 1:n)/T(n)
-    x_trial .= (x_cen * (1 - ref) + ref * last(pairs)[1])
+    x_cen .= sum(pairs[i][1] for i in 1:n) / T(n)
+    x_trial .= x_cen * (1 - ref) + ref * last(pairs)[1]
     f_ref = obj(nlp, x_trial)
     f_bver = pairs[1][2]
 
@@ -70,7 +70,7 @@ function nelder_mead(nlp :: AbstractNLPModel;
       shrink = false
     # Expansion
     elseif f_ref < pairs[1][2]
-      x_trial .= (x_cen * (1 - exp) + exp * last(pairs)[1])
+      x_trial .= x_cen * (1 - exp) + exp * last(pairs)[1]
       f_exp = obj(nlp,x_trial)
       if f_exp < f_ref
         pairs[n+1][1] .= x_trial
@@ -84,7 +84,7 @@ function nelder_mead(nlp :: AbstractNLPModel;
     elseif f_ref ≥ pairs[n][2]
       # Outside
       if pairs[n][2] ≤ f_ref < pairs[n+1][2]
-        x_trial .= (x_cen * (1 - ocn) + ocn * pairs[n+1][1])
+        x_trial .= x_cen * (1 - ocn) + ocn * pairs[n+1][1]
         f_ocn = obj(nlp, x_trial)
         if f_ocn ≤ f_ref
           pairs[n+1][1] .= x_trial
@@ -93,7 +93,7 @@ function nelder_mead(nlp :: AbstractNLPModel;
         end
         # Inside
       else
-        x_trial .= (x_cen * (1 - icn) + icn * pairs[n+1][1])
+        x_trial .= x_cen * (1 - icn) + icn * pairs[n+1][1]
         f_icn = obj(nlp, x_trial)
         if f_icn < pairs[n+1][2]
           pairs[n+1][1] .= x_trial
@@ -105,10 +105,10 @@ function nelder_mead(nlp :: AbstractNLPModel;
 
     reshape = true
     if oriented_restart && n_res < max_restart
-      fₖ₊₁ = sum(pairs[i][2] for i in 1:nlp.meta.nvar+1)/(nlp.meta.nvar+1)
-      V = hcat([pairs[i][1] - pairs[1][1]  for i in 2:nlp.meta.nvar+1]...)
-      δ = [pairs[i][2] - pairs[1][2] for i in 2:nlp.meta.nvar+1]
-      σ₋ = minimum(norm(pairs[i][1] - pairs[1][1]) for i in 2:nlp.meta.nvar+1)
+      fₖ₊₁ = sum(pairs[i][2] for i in 1:n+1) / (n+1)
+      V = hcat([pairs[i][1] - pairs[1][1]  for i in 2:n+1]...)
+      δ = [pairs[i][2] - pairs[1][2] for i in 2:n+1]
+      σ₋ = minimum(norm(pairs[i][1] - pairs[1][1]) for i in 2:n+1)
 
       ϕ, deg_simplex = try
         ϕ = V'\δ
@@ -116,11 +116,11 @@ function nelder_mead(nlp :: AbstractNLPModel;
       catch e
         isa(e, SingularException) && zeros(T, n), true
       end
-      
+
       if deg_simplex
-        for j in 2:nlp.meta.nvar+1
+        for j in 2:n+1
           y₁ = copy(pairs[1][1])
-          y₁[j-1] += sign(ϕ[j-1]) * 0.5 * σ₋
+          y₁[j-1] += sign(ϕ[j-1]) * σ₋ / 2
           pairs[j][1] .= y₁
           pairs[j][2] = obj(nlp, pairs[j][1])
         end
@@ -132,7 +132,7 @@ function nelder_mead(nlp :: AbstractNLPModel;
 
     if shrink && reshape
       for i = 2:n+1
-        x_trial .= (pairs[i][1] + pairs[1][1])/2
+        x_trial .= (pairs[i][1] + pairs[1][1]) / 2
         pairs[i][1] .= x_trial
         pairs[i][2] = obj(nlp, x_trial)
       end
