@@ -22,7 +22,7 @@ function tests()
         nlp = ADNLPModel(f, x₀)
 
         for T in (Float16, Float32, Float64, BigFloat)
-          @testset "Method $mtd in $T" begin
+          @testset "Method $mtd in $T, function $f" begin
             reset!(nlp)
             output = with_logger(NullLogger()) do
               mtd(nlp, x=T.(x₀), max_eval=10000)

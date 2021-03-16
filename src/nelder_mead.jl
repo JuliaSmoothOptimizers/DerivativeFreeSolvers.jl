@@ -114,7 +114,7 @@ function nelder_mead(nlp :: AbstractNLPModel;
         ϕ = V'\δ
         ϕ, fₖ₊₁ - fₖ ≥ - α * norm(ϕ)^2 && fₖ₊₁ - fₖ < 0
       catch e
-        isa(e, SingularException) && zeros(T, n), true
+        zeros(T, n), true
       end
 
       if deg_simplex

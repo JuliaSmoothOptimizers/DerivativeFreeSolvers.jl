@@ -1,4 +1,5 @@
 export coordinate_search
+
 """
     coordinate_search(nlp)
 
