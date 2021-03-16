@@ -1,7 +1,7 @@
 using DerivativeFreeSolvers
 
 # JSO
-using NLPModels
+using ADNLPModels, NLPModels
 
 # stdlib
 using LinearAlgebra, Logging, Test
@@ -40,11 +40,11 @@ function tests()
   methods = [mads, madsX]
   @testset "Constrained problems with non-empty interior" begin
     for mtd in methods
-      for (nlp, sol) in [(ADNLPModel(x->sum(x.^2), [2.1; 3.2], lvar=-ones(2), uvar=4*ones(2)), zeros(2)),
-                         (ADNLPModel(x->sum(x.^2), [2.1; 3.2], lvar=[0.5; 0.5], uvar=4*ones(2)), [0.5; 0.5]),
-                         (ADNLPModel(x->sum(x.^2), [2.1; 3.2], lvar=[0.5; -0.5], uvar=4*ones(2)), [0.5; 0.0]),
-                         (ADNLPModel(x->sum(x.^2), [2.1; 3.2], c=x->[2x[1] + x[2]], lcon=[1.0], ucon=[Inf]), [0.4; 0.2]),
-                         (ADNLPModel(x->sum(x.^2), [-0.1; 0.7], c=x->[x[1]^2 + 2x[2]^2], lcon=[1.0], ucon=[Inf], lvar=zeros(2)), [0.0; sqrt(2)/2]),
+      for (nlp, sol) in [(ADNLPModel(x->sum(x.^2), [2.1; 3.2], -ones(2), 4*ones(2)), zeros(2)),
+                         (ADNLPModel(x->sum(x.^2), [2.1; 3.2], [0.5; 0.5], 4*ones(2)), [0.5; 0.5]),
+                         (ADNLPModel(x->sum(x.^2), [2.1; 3.2], [0.5; -0.5], 4*ones(2)), [0.5; 0.0]),
+                         (ADNLPModel(x->sum(x.^2), [2.1; 3.2], x->[2x[1] + x[2]], [1.0], [Inf]), [0.4; 0.2]),
+                         (ADNLPModel(x->sum(x.^2), [-0.1; 0.7], zeros(2), Inf * ones(2), x->[x[1]^2 + 2x[2]^2], [1.0], [Inf]), [0.0; sqrt(2)/2]),
                         ]
 
         for T in (Float16, Float32, Float64, BigFloat)
