@@ -1,7 +1,7 @@
 module DerivativeFreeSolvers
 
 # JSO
-using NLPModels, SolverTools
+using NLPModels, SolverCore
 
 # stdlib
 using LinearAlgebra, Printf

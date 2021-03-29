@@ -77,7 +77,7 @@ function mads(nlp :: AbstractNLPModel;
   # Hk = qᵀq I - 2 qqᵀ
   # Hk eⱼ = qᵀq eⱼ - 2 qᵀeⱼ q = qᵀq eⱼ - 2qⱼ q
 
-  # TODO: Use SolverTools log
+  # TODO: Use SolverCore log
   @info log_header([:iter, :nf, :f, :P, :ϕ, :Δ, :μ, :status], [Int, Int, T, T, T, T, String],
                    hdr_override=Dict(:f=>"f(x)", :P=>"P(x)", :ϕ=>"ϕ(x;μ)"))
 
