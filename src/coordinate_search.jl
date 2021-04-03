@@ -12,7 +12,7 @@ function coordinate_search(nlp :: AbstractNLPModel;
                            tol :: Real = min(√eps(eltype(x)), 1e-4),
                            α :: Real = one(eltype(x)),
                            β :: Real = 2 * one(eltype(x)),
-                           ftol :: Real = -1.0 # -one(eltype(x))
+                           ftol :: Real = -1.0, # -one(eltype(x))
                            max_time :: Float64  = 30.0,
                            max_eval :: Int = -1,
                            greedy :: Bool = true)
