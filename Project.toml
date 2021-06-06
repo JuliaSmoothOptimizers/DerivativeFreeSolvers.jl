@@ -11,7 +11,7 @@ Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 SolverCore = "ff4d7338-4cf1-434d-91df-b86cb86fb843"
 
 [compat]
-NLPModels = "0.14"
+NLPModels = "0.14, 0.15"
 SolverCore = "0.1"
 julia = "1"
 
