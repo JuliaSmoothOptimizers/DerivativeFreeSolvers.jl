@@ -4,7 +4,9 @@ using DerivativeFreeSolvers
 using ADNLPModels, NLPModels
 
 # stdlib
-using LinearAlgebra, Logging, Test
+using LinearAlgebra, Logging, Random, Test
+
+Random.seed!(1998)
 
 function tests()
   methods = [coordinate_search, mads,
