@@ -12,4 +12,8 @@ makedocs(
               "Reference" => "reference.md"]
 )
 
-deploydocs(repo = "github.com/JuliaSmoothOptimizers/DerivativeFreeSolvers.jl.git", devbranch = "main")
+deploydocs(
+  repo = "github.com/JuliaSmoothOptimizers/DerivativeFreeSolvers.jl.git",
+  push_preview = true,
+  devbranch = "main",
+)
