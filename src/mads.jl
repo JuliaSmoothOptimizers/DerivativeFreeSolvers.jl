@@ -145,6 +145,12 @@ function mads(nlp :: AbstractNLPModel;
     :unknown
   end
 
-  return GenericExecutionStats(status, nlp, solution=x, objective=fx, primal_feas=Px,
-                               iter=iter, elapsed_time=elapsed_time)
+  stats = GenericExecutionStats(nlp)
+  set_status!(stats, status)
+  set_solution!(stats, x)
+  set_objective!(stats, fx)
+  set_iter!(stats, iter)
+  set_primal_residual!(stats, Px)
+  set_time!(stats, elapsed_time)
+  return stats
 end

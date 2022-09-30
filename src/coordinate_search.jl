@@ -69,7 +69,11 @@ function coordinate_search(nlp :: AbstractNLPModel;
       end
   end
 
-  return GenericExecutionStats(status, nlp, solution=x, objective=f,
-                               iter = k, elapsed_time = el_time)
-
+  stats = GenericExecutionStats(nlp)
+  set_status!(stats, status)
+  set_solution!(stats, x)
+  set_objective!(stats, f)
+  set_iter!(stats, k)
+  set_time!(stats, el_time)
+  return stats
 end
