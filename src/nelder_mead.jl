@@ -156,6 +156,11 @@ function nelder_mead(nlp :: AbstractNLPModel;
     end
   end
 
-  return GenericExecutionStats(status, nlp, solution=pairs[1][1], objective=pairs[1][2],
-                               iter = k, elapsed_time = el_time)
+  stats = GenericExecutionStats(nlp)
+  set_status!(stats, status)
+  set_solution!(stats, pairs[1][1])
+  set_objective!(stats, pairs[1][2])
+  set_iter!(stats, k)
+  set_time!(stats, el_time)
+  return stats
 end
