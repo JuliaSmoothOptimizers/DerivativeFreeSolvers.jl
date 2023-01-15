@@ -6,10 +6,10 @@ on:
   workflow_dispatch:
 jobs:
   TagBot:
-    if: github.event_name == 'workflow_dispatch' || github.actor == 'JuliaTagBot'
+    if: githubDerivativeFreeSolversevent_name == 'workflow_dispatch' || githubDerivativeFreeSolversactor == 'JuliaTagBot'
     runs-on: ubuntu-latest
     steps:
       - uses: JuliaRegistries/TagBot@v1
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          ssh: ${{ secrets.DOCUMENTER_KEY }}
+          token: ${{ secretsDerivativeFreeSolversGITHUB_TOKEN }}
+          ssh: ${{ secretsDerivativeFreeSolversDOCUMENTER_KEY }}
