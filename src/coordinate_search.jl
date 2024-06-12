@@ -8,10 +8,11 @@ It minimizes a certain function f by walking on a grid and taking a step towards
 When it can no longer find any smaller values, it reduces the grid by a factor of β, repeating the process.
 """
 function coordinate_search(nlp :: AbstractNLPModel;
-                           x :: AbstractVector=copy(nlp.meta.x0),
+                           x :: AbstractVector = copy(nlp.meta.x0),
                            tol :: Real = min(√eps(eltype(x)), 1e-4),
                            α :: Real = one(eltype(x)),
                            β :: Real = 2 * one(eltype(x)),
+                           ftol :: Real = -1.0, # -one(eltype(x))
                            max_time :: Float64  = 30.0,
                            max_eval :: Int = -1,
                            greedy :: Bool = true)
@@ -22,6 +23,7 @@ function coordinate_search(nlp :: AbstractNLPModel;
   el_time = 0.0
   start_time = time()
   tired = neval_obj(nlp) > max_eval >= 0 || el_time > max_time
+  ftol_reached = false
   optimal = α < tol
   T = eltype(x)
   status = :unknown
@@ -30,13 +32,17 @@ function coordinate_search(nlp :: AbstractNLPModel;
   f = obj(nlp, x)
   best_f = f
   best_i = 0
-  while !(optimal || tired)
+  while !(optimal || ftol_reached || tired)
     @info log_row(Any[k, f, α])
     xt = copy(x)
     success = false
+    worst_fi = f
     for i in 1:nlp.meta.nvar, s in [-1, 1]
       xt[i] = x[i] + α * s
       f_xt = obj(nlp, xt)
+      
+      f_xt > worst_fi && (worst_fi = f_xt)
+
       if f_xt < best_f
         success = true
         best_f = f_xt
@@ -56,17 +62,20 @@ function coordinate_search(nlp :: AbstractNLPModel;
     k += 1
     el_time = time() - start_time
     tired = neval_obj(nlp) > max_eval >= 0 || el_time > max_time
+    ftol_reached = worst_fi - best_f <= ftol
     optimal = α <= tol
   end
 
   if optimal
     status = :acceptable
+  elseif ftol_reached
+    status = :small_residual # ? :first-order :acceptable
   elseif tired
     if neval_obj(nlp) > max_eval >= 0
       status = :max_eval
-      elseif el_time >= max_time
-        status = :max_time
-      end
+    elseif el_time >= max_time
+      status = :max_time
+    end
   end
 
   stats = GenericExecutionStats(nlp)
